@@ -1,9 +1,6 @@
-
-
 const PASSWORD = "Aaron"; // Change this password
 const SALT = crypto.getRandomValues(new Uint8Array(16));
 
-// Key derivation using PBKDF2
 async function deriveKey(password, salt) {
     const enc = new TextEncoder();
     const keyMaterial = await crypto.subtle.importKey(
@@ -89,7 +86,7 @@ function searchKeywords(decryptedData, keywords) {
 }
 
 // Example usage
-async function demoEncryption() {
+async function encryptAndStore() {
     const medicalData = {
         records: [
             { id: 1, name: "John Doe", age: 50, condition: "Hypertension" },
@@ -101,11 +98,19 @@ async function demoEncryption() {
 
     const encryptedData = await encryptData(medicalData, PASSWORD, SALT);
     document.getElementById("output").textContent = "Encrypted Data:\n" + JSON.stringify(encryptedData, null, 2);
+}
 
+async function searchAndRetrieve() {
+    const encryptedData = JSON.parse(document.getElementById("output").textContent);
     const decryptedData = await decryptData(encryptedData, PASSWORD);
     const keywords = ["hypertension"];
     const results = searchKeywords(decryptedData, keywords);
 
     document.getElementById("output").textContent += "\n\nFiltered Records with keyword(s): " + keywords + "\n" + JSON.stringify(results, null, 2);
 }
+
+
+
+
+
 
