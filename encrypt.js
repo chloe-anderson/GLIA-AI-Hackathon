@@ -1,6 +1,7 @@
-const PASSWORD = "Aaron"; // Change this password
+const PASSWORD = "123"; // Change this password
 const SALT = crypto.getRandomValues(new Uint8Array(16));
 
+//
 async function deriveKey(password, salt) {
     const enc = new TextEncoder();
     const keyMaterial = await crypto.subtle.importKey(
