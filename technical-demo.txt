@@ -1,5 +1,5 @@
 We want our demo to be able to:
-[ ] User uploads information
+[X] User uploads information
 [ ] Uploaded information is encrypted
 [ ] Information is stored in JSON
 [ ] Ability for user to search for a keyword like "hypertension" and see if it 

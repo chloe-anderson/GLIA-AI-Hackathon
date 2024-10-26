@@ -22,17 +22,29 @@
     fileInfo.textContent = `File name: ${file.name}, size: ${file.size} bytes`;
 
 </script>
-<style>
-	.button {}
-</style>
+
+
+
+
 <body>
 	<h1>GLIA</h1>
 	<p>Upload your documents to our data consolidation system.</p>
 	<input type="file" id="upload" accept=".pdf, .docx" />
 	<button onclick="uploadPDF()">Upload</button>
 
+	<h2>Encryption and Decryption</h2>
+	<button onclick="encryption()">Encrypt</button>
+	<pre id="output"></pre>
 
+	<script src="encrypt.js"></script>
 </body>
+
+
+
+
+
+
+
 
 <style>
 :root {
