@@ -39,13 +39,13 @@ async function encryptData(data, password, salt) {
         padData(data)
     );
 
+	document.getElementById("successfullyEncrypted").textContent = "Document successfully encrypted";
     return {
         salt: btoa(String.fromCharCode(...salt)),
         iv: btoa(String.fromCharCode(...iv)),
         data: btoa(String.fromCharCode(...new Uint8Array(encryptedData)))
     };
 
-	document.getElementById("successfullyEncrypted").textContent = "Document successfully encrypted";
 }
 
 // Decrypt JSON data
@@ -71,7 +71,7 @@ async function decryptData(encryptedData, password) {
 function padData(data) {
     const padding = 16 - (data.byteLength % 16);
     const padded = new Uint8Array(data.byteLength + padding);
-    padded.set(new Uint8Array((data));
+    padded.set(new Uint8Array(data));
     padded.fill(padding, data.byteLength);
     return padded;
 }

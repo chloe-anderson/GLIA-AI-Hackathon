@@ -49,15 +49,22 @@
 
 		const reader = new FileReader();
 		reader.onload = function(event) {
-		//	try {
-			//	uploadedJsonContent = JSON.parse(event.target.result);
-				const jsonContent = event.target.result;
+			try {
+				uploadedJsonContent = JSON.parse(event.target.result);
+				//const jsonContent = event.target.result;
 				fileInfo.textContent = `File name: ${file.name}, size: ${file.size} bytes`;
 				document.getElementById("uploadComplete").textContent = "Document successfully uploaded";
-		//	} catch (error) {
-		//		fileInfo.textContent = "Error parsing JSON file";
-		//	}
+            console.log("File successfully uploaded and parsed:", uploadedJsonContent); // Debugging message
+			} catch (error) {
+				fileInfo.textContent = "Error parsing JSON file";
+			}
 		};
+
+		reader.onerror = function() {
+                fileInfo.textContent = "Error reading file.";
+                console.error("Error reading file."); // Debugging message
+            };
+
 		reader.readAsText(file);
 	}
 
@@ -69,12 +76,12 @@
             const encoder = new TextEncoder();
             const data = encoder.encode(JSON.stringify(uploadedJsonContent));
             const encryptedData = await encryptData(data, PASSWORD, SALT);
-            document.getElementById("output").textContent = "Encrypted Data:\n" + JSON.stringify(encryptedData, null, 2);
+            //document.getElementById("output").textContent = "Encrypted Data:\n" + JSON.stringify(encryptedData, null, 2);
             document.getElementById("successfullyEncrypted").textContent = "Document successfully encrypted";
 	}
 
 	async function searchAndRetrieve() {
-            const encryptedData = JSON.parse(document.getElementById("output").textContent);
+            const encryptedData = JSON.parse(JSON.stringify(encryptedData, null, 2));
 
             // Get keywords from user input
             const keywordInput = document.getElementById("keywordInput").value.trim();
