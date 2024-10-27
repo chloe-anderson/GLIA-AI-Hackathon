@@ -1,38 +1,13 @@
 <!DOCTYPE html>
-<html>
-<script>
-	function uploadPDF() {
-		const fileInput = document.getElementById('upload');
-		const fileInfo = document.getElementById('file-info');
-
-    // Check if a file is selected
-    if (fileInput.files.length === 0) {
-        fileInfo.textContent = "No file selected.";
-        return;
-    }
-
-    const file = fileInput.files[0];
-
-    const validTypes = ["application/pdf", "text/plain"]
-
-    // Validate if the selected file is a PDF
-    if (!validTypes.includes(file.type)) {
-        fileInfo.textContent = "Please select a valid PDF or TXT file.";
-        return;
-    }
-
-    fileInfo.textContent = `File name: ${file.name}, size: ${file.size} bytes`;
-
-</script>
-
-
-
-
+<html lang="en">
 <body>
 	<h1>GLIA</h1>
 	<p>Upload your documents to our data consolidation system.</p>
-	<input type="file" id="upload" accept=".pdf, .docx" />
-	<button onclick="uploadPDF()">Upload</button>
+	<input type="file" id="upload" accept=".json" />
+	<button onclick="uploadJSON()">Upload</button>
+
+	<p id="uploadComplete"></p>
+	<p id="file-info"></p>
 
 	<h2>Encryption and Decryption</h2>
 	<button onclick="encryptAndStore()">Encrypt Data</button>
@@ -40,12 +15,37 @@
 	<pre id="output"></pre>
 
 	<script src="encrypt.js"></script>
+
+	<script>
+	function uploadJSON() {
+		const fileInput = document.getElementById('upload');
+		const fileInfo = document.getElementById('file-info');
+
+		// Check if a file is selected
+		if (fileInput.files.length === 0) {
+			fileInfo.textContent = "No file selected.";
+			return;
+		}
+
+		const file = fileInput.files[0];
+
+		// Validate if the selected file is json
+		if (file.type !== "application/json") {
+			fileInfo.textContent = "Please input a JSON file.";
+			return;
+		}
+
+		const reader = new FileReader();
+		reader.onload = function(event) {
+			const jsonContent = event.target.result;
+			fileInfo.textContent = `File name: ${file.name}, size: ${file.size} bytes`;
+			document.getElementById("uploadComplete").textContent = "Document successfully uploaded";
+		};
+		reader.readAsText(file);
+	}
+	</script>
+
 </body>
-
-
-
-
-
 
 
 
