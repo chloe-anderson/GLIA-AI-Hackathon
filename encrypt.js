@@ -62,8 +62,6 @@ async function decryptData(encryptedData, password) {
         data
     );
 
-    //const decoder = new TextDecoder();
-    //return JSON.parse(decoder.decode(unpadData(new Uint8Array(decryptedData))));
     return unpadData(new Uint8Array(decryptedData));
 }
 
@@ -80,72 +78,4 @@ function unpadData(data) {
     const padding = data[data.byteLength - 1];
     return data.slice(0, data.byteLength - padding);
 }
-
-// Keyword search in decrypted data
-function searchKeywords(decryptedData, keywords) {
-    return decryptedData.records.filter(record =>
-        keywords.some(keyword =>
-            record.condition.toLowerCase().includes(keyword.toLowerCase())
-        )
-    );
-}
-
-// Example usage
-async function encryptAndStore() {
-    const medicalData = {
-        records: [
-            { id: 1, name: "John Doe", age: 50, condition: "Hypertension" },
-            { id: 2, name: "Jane Smith", age: 30, condition: "Diabetes" },
-            { id: 3, name: "Mike Lee", age: 40, condition: "Hypertension" },
-            { id: 4, name: "Emily Davis", age: 35, condition: "Healthy" }
-        ]
-    };
-	const encoder = new TextEncoder();
-	const data = encoder.encode(JSON.stringify(medicalData));
-    const encryptedData = await encryptData(data, PASSWORD, SALT);
-    document.getElementById("output").textContent = "Encrypted Data:\n" + JSON.stringify(encryptedData, null, 2);
-}
-
-async function searchAndRetrieve() {
-    const encryptedData = JSON.parse(document.getElementById("output").textContent);
-   
-	//keywords = user specified keywrods from the input
-    const keywordInput = document.getElementById("keywordInput").value.trim();	
-	if(!keywordInput) {
-		document.getElementById("output").textContent += "\n\nEnter a keyword to search for.";
-		return;
-	}
-    const keywords = keywordInput.split(/\s+/);	//split by whitespace
-
-    const decryptedArray = await decryptData(encryptedData, PASSWORD);
-	const decoder = new TextDecoder();
-	const decryptedData = JSON.parse(decoder.decode(decryptedArray));
-
-    //search for the user-specified keywords
-    const allResults = searchKeywords(decryptedData, keywords);
-
-	//only display non-identifiable, anonymized results
-	const searchResults = document.getElementById("search-results");
-	if(allResults.length === 0) {
-		searchResults.textContent = "No matches found for those keywords.";
-	} else {
-		searchResults.innerHTML = results.map(record =>
-	`		<div>
-                <strong>Age:</strong> ${record.age} <br>
-                <strong>Condition:</strong> ${record.condition} <br>
-                <strong>Pharma Info:</strong> ${record.medicine_info || 'N/A'} <br>
-                <strong>Medical History:</strong> ${record.past_medical_history || 'N/A'} <br><br>
-            </div>
-        `).join('');
-	}
-
-
-    //document.getElementById("output").textContent += "\n\nFiltered Records with keyword(s): " + keywords + "\n" + JSON.stringify(results, null, 2);
-
-}
-
-
-
-
-
 

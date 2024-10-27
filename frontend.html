@@ -27,6 +27,7 @@
 	<script>
 
 	let uploadedJsonContent = null;
+	let encryptedData = null;
 	
 	function uploadJSON() {
 
@@ -75,13 +76,16 @@
             }
             const encoder = new TextEncoder();
             const data = encoder.encode(JSON.stringify(uploadedJsonContent));
-            const encryptedData = await encryptData(data, PASSWORD, SALT);
+            encryptedData = await encryptData(data, PASSWORD, SALT);
             //document.getElementById("output").textContent = "Encrypted Data:\n" + JSON.stringify(encryptedData, null, 2);
             document.getElementById("successfullyEncrypted").textContent = "Document successfully encrypted";
 	}
 
 	async function searchAndRetrieve() {
-            const encryptedData = JSON.parse(JSON.stringify(encryptedData, null, 2));
+		if (!encryptedData) {
+			document.getElementById("output").textContent = "Please encrypt the data first.";
+			return;
+		}
 
             // Get keywords from user input
             const keywordInput = document.getElementById("keywordInput").value.trim();
@@ -97,6 +101,12 @@
             const decoder = new TextDecoder();
             const decryptedData = JSON.parse(decoder.decode(decryptedArray));
 
+	console.log("Decrypted Data:", decryptedData);
+		const records = decryptedData.records || decryptedData;
+    if (!Array.isArray(records)) {
+	    document.getElementById("output").textContent = "No records array";
+	return;
+    }
             // Search for the keywords and filter results
             const results = searchKeywords(decryptedData, keywords);
 
@@ -117,7 +127,13 @@
             }
         }
 
-
+function searchKeywords(records, keywords) {
+    return records.filter(record =>
+        keywords.some(keyword =>
+            (record.condition || '').toLowerCase().includes(keyword.toLowerCase())
+        )
+    );
+}
 
 	</script>
 
