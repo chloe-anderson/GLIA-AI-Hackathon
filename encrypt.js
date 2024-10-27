@@ -44,6 +44,8 @@ async function encryptData(data, password, salt) {
         iv: btoa(String.fromCharCode(...iv)),
         data: btoa(String.fromCharCode(...new Uint8Array(encryptedData)))
     };
+
+	document.getElementById("successfullyEncrypted").textContent = "Document successfully encrypted";
 }
 
 // Decrypt JSON data
@@ -120,11 +122,25 @@ async function searchAndRetrieve() {
 	const decryptedData = JSON.parse(decoder.decode(decryptedArray));
 
     //search for the user-specified keywords
-    const results = searchKeywords(decryptedData, keywords);
+    const allResults = searchKeywords(decryptedData, keywords);
 
-    document.getElementById("output").textContent += "\n\nFiltered Records with keyword(s): " + keywords + "\n" + JSON.stringify(results, null, 2);
+	//only display non-identifiable, anonymized results
+	const searchResults = document.getElementById("search-results");
+	if(allResults.length === 0) {
+		searchResults.textContent = "No matches found for those keywords.";
+	} else {
+		searchResults.innerHTML = results.map(record =>
+	`		<div>
+                <strong>Age:</strong> ${record.age} <br>
+                <strong>Condition:</strong> ${record.condition} <br>
+                <strong>Pharma Info:</strong> ${record.medicine_info || 'N/A'} <br>
+                <strong>Medical History:</strong> ${record.past_medical_history || 'N/A'} <br><br>
+            </div>
+        `).join('');
+	}
 
-//search-results
+
+    //document.getElementById("output").textContent += "\n\nFiltered Records with keyword(s): " + keywords + "\n" + JSON.stringify(results, null, 2);
 
 }
 

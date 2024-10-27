@@ -9,20 +9,27 @@
 	<p id="uploadComplete"></p>
 	<p id="file-info"></p>
 
-	<h2>Encryption and Decryption</h2>
+	<h2>Encryption</h2>
 	<button onclick="encryptAndStore()">Encrypt Data</button>
 
+	<p id="successfullyEncrypted"></p>
 
-	<input type="text" id="keywordInput" />
+	<h2>Search Encrypted Data</h2>
+	<input type="text" id="keywordInput" placeholder="Enter keywords" />
 
 	<button onclick="searchAndRetrieve()">Search Data</button>
-	<p id="search-results"></p>
+
 	<pre id="output"></pre>
+	<p id="search-results"></p>
 
 	<script src="encrypt.js"></script>
 
 	<script>
+
+	let uploadedJsonContent = null;
+	
 	function uploadJSON() {
+
 		const fileInput = document.getElementById('upload');
 		const fileInfo = document.getElementById('file-info');
 
@@ -42,13 +49,72 @@
 
 		const reader = new FileReader();
 		reader.onload = function(event) {
-			const jsonContent = event.target.result;
-			fileInfo.textContent = `File name: ${file.name}, size: ${file.size} bytes`;
-			document.getElementById("uploadComplete").textContent = "Document successfully uploaded";
+		//	try {
+			//	uploadedJsonContent = JSON.parse(event.target.result);
+				const jsonContent = event.target.result;
+				fileInfo.textContent = `File name: ${file.name}, size: ${file.size} bytes`;
+				document.getElementById("uploadComplete").textContent = "Document successfully uploaded";
+		//	} catch (error) {
+		//		fileInfo.textContent = "Error parsing JSON file";
+		//	}
 		};
 		reader.readAsText(file);
 	}
+
+	async function encryptAndStore() {
+            if (!uploadedJsonContent) {
+                document.getElementById("output").textContent = "Please upload a JSON file first.";
+                return;
+            }
+            const encoder = new TextEncoder();
+            const data = encoder.encode(JSON.stringify(uploadedJsonContent));
+            const encryptedData = await encryptData(data, PASSWORD, SALT);
+            document.getElementById("output").textContent = "Encrypted Data:\n" + JSON.stringify(encryptedData, null, 2);
+            document.getElementById("successfullyEncrypted").textContent = "Document successfully encrypted";
+	}
+
+	async function searchAndRetrieve() {
+            const encryptedData = JSON.parse(document.getElementById("output").textContent);
+
+            // Get keywords from user input
+            const keywordInput = document.getElementById("keywordInput").value.trim();
+            if (!keywordInput) {
+                document.getElementById("output").textContent += "\n\nPlease enter keywords to search.";
+                return;
+            }
+
+            const keywords = keywordInput.split(/\s+/); // Split keywords by whitespace
+
+            // Decrypt the data
+            const decryptedArray = await decryptData(encryptedData, PASSWORD);
+            const decoder = new TextDecoder();
+            const decryptedData = JSON.parse(decoder.decode(decryptedArray));
+
+            // Search for the keywords and filter results
+            const results = searchKeywords(decryptedData, keywords);
+
+            // Display search results with specified fields only
+            const searchResults = document.getElementById("search-results");
+            if (results.length === 0) {
+                searchResults.textContent = "No records found for the specified keyword(s).";
+            } else {
+                // Format and display each matching record
+                searchResults.innerHTML = results.map(record => `
+                    <div>
+                        <strong>Age:</strong> ${record.age} <br>
+                        <strong>Condition:</strong> ${record.condition} <br>
+                        <strong>Pharma Info:</strong> ${record.pharma_info || 'N/A'} <br>
+                        <strong>Medical History:</strong> ${record.past_medical_history || 'N/A'} <br><br>
+                    </div>
+                `).join('');
+            }
+        }
+
+
+
 	</script>
+
+
 
 </body>
 
